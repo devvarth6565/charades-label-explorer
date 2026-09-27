@@ -129,9 +129,12 @@ def cmd_search(args: argparse.Namespace) -> int:
             print(dim("       match: ") + snippet.replace("\n", " ")[: width + 20])
 
     shown = len(result["items"])
-    start = (result["page"] - 1) * result["page_size"] + 1 if shown else 0
+    if not shown:
+        print(dim("\nNo clips match these filters."))
+        return 0
+    start = (result["page"] - 1) * result["page_size"] + 1
     print(dim(
-        f"\n{start}-{start + shown - 1 if shown else 0} of {result['total']:,} clips "
+        f"\n{start}-{start + shown - 1} of {result['total']:,} clips "
         f"({result['hours']} h, {result['segments']:,} segments). "
         f"Page {result['page']}/{result['pages']}. Use --page N, or `./run.sh show <ID>`."
     ))
