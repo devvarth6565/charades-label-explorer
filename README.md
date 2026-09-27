@@ -232,16 +232,15 @@ curl), to prove the clean-machine requirement.
 
 ## Time log
 
-<!-- Fill in your real times before submitting. -->
-
 | Section | What | Time |
 |---|---|--:|
-| 1. Dataset | Search + compare candidates, profile Charades, checksum-pinned download | ~__ min |
-| 2. Ingest + summary | Parser, QA checks, fixture tests | ~__ min |
-| 3. Search + filter | SQLite FTS5 index, query layer, facets, CLI | ~__ min |
-| 4. Web UI | API server, table, detail drawer, timelines | ~__ min |
-| Extras | Sample videos via range requests, playback sync | ~__ min |
-| 5. README + deploy | Docs, Dockerfile, Render, CI | ~__ min |
+| 1. Dataset | Read the brief, compared 5 candidate datasets, profiled Charades, checksum-pinned download | ~15 min |
+| 2-3. Tool + search/filter | Parser + QA checks, SQLite FTS5 search and filters, CLI, web UI, sample videos, tests | ~25 min |
+| 4. README | README with Summary Card, CI workflow, Docker/Render config | ~15 min |
+| Review + testing | Ran the app end to end, tested search, filters and video playback, walked through the architecture, cleaned up the repo | ~50 min |
+| Bonus: deploy | Deployed on Render, checked the live site, opened it to reviewers | ~20 min |
+| Final polish | Reflections, README links, time log | ~20 min |
+| **Total** | | **~2 h 25 min** |
 
 ## Reflections
 
