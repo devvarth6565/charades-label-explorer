@@ -1,0 +1,6 @@
+id,subject,scene,quality,relevance,verified,script,objects,descriptions,actions,length
+AAA01,S001,Kitchen,6,7,Yes,"A person is cooking at the stove, then drinks from a cup.",food;stove;cup,Someone cooks food on the stove.;A person cooks and then drinks.,c004 0.00 12.50;c003 11.00 15.20,18.00
+AAA02,S002,Home Office / Study (A room in a house used for work),5,4,Yes,A person opens the door and sits on a chair.,door;chair,A person walks through a door and sits down.,c006 5.00 20.40;c001 0.50 4.00,20.00
+AAA03,S001,Bedroom,3,2,No,A person holds some clothes.,clothes,A person folds clothes.,,12.00
+AAA04,S003,Kitchen,,6,Yes,A person watches out the window while holding a cup.,window;cup,Person looks out a window.,c005 2.00 9.00;c003 8.00 5.00;c099 1.00 2.00;garbage,10.00
+AAA05,S002,Bedroom,7,7,Yes,A person holds clothes then closes the closet door.,clothes;door,A person holds a shirt and shuts the door.,c000 0.00 30.00;c002 26.00 34.50,30.00

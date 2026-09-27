@@ -1,0 +1,7 @@
+c000 Holding some clothes
+c001 Opening a door
+c002 Closing a door
+c003 Drinking from a cup
+c004 Cooking something
+c005 Watching something out a window
+c006 Sitting on a chair

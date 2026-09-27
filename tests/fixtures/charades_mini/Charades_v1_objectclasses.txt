@@ -1,0 +1,6 @@
+o000 None
+o001 cup/glass/bottle
+o002 door
+o003 clothes
+o004 food
+o005 window
