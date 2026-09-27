@@ -5,7 +5,6 @@ Uses the same Store/Query as the web API, so both always agree.
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import os
 import re
@@ -15,6 +14,7 @@ from typing import Dict, List, Optional
 
 from . import config
 from .charades import ISSUES
+from .export import write_csv
 from .search import MARK_END, MARK_START, SORTS, Query, QueryError, Store
 
 _COLOR = sys.stdout.isatty() and "NO_COLOR" not in os.environ
@@ -136,23 +136,6 @@ def cmd_search(args: argparse.Namespace) -> int:
         f"Page {result['page']}/{result['pages']}. Use --page N, or `./run.sh show <ID>`."
     ))
     return 0
-
-
-def write_csv(rows: List[dict], stream) -> None:
-    writer = csv.writer(stream)
-    writer.writerow([
-        "id", "split", "scene", "length_s", "quality", "relevance", "verified",
-        "n_actions", "coverage", "actions", "action_triplets", "objects", "script",
-        "issues",
-    ])
-    for c in rows:
-        writer.writerow([
-            c["id"], c["split"], c["scene"], c["length"], c["quality"], c["relevance"],
-            {True: "yes", False: "no", None: ""}[c["verified"]], c["n_actions"], c["coverage"],
-            "; ".join(f"{s['label']} [{s['start']:.1f}-{s['end']:.1f}s]" for s in c["segments"]),
-            ";".join(f"{s['class_id']} {s['start']:.2f} {s['end']:.2f}" for s in c["segments"]),
-            ";".join(c["objects"]), c["script"], ";".join(c["issues"]),
-        ])
 
 
 # -------------------------------------------------------------------- show

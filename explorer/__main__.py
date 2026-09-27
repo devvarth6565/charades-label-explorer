@@ -7,6 +7,7 @@ USAGE = """usage: python3 -m explorer <command> [options]
 
 commands:
   setup     download + verify the dataset and build the search index
+  serve     start the web UI (default http://127.0.0.1:8000)
   search    search and filter clips in the terminal
   show      show one clip with an ASCII action timeline
   stats     dataset summary
@@ -21,6 +22,8 @@ def main(argv=None) -> int:
     command, rest = argv[0], argv[1:]
     if command == "setup":
         from .setup_data import main as run
+    elif command == "serve":
+        from .server import main as run
     elif command in ("search", "show", "stats"):
         from .cli import main as cli_main
 

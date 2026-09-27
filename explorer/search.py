@@ -394,6 +394,11 @@ class Store:
             ]
 
         per_clip = "COUNT(DISTINCT clip_rowid) n FROM segment WHERE {match}"
+        issue_where, issue_params = self._where(query, fts_expr, {"issue"})
+        any_issue, no_issue = conn.execute(
+            "SELECT COALESCE(SUM(c.n_issues > 0), 0), COALESCE(SUM(c.n_issues = 0), 0)"
+            f" FROM clip c {issue_where}", issue_params,
+        ).fetchone()
         return {
             "scene": run(
                 "SELECT scene, COUNT(*) n FROM clip WHERE {match} GROUP BY scene ORDER BY n DESC",
@@ -403,7 +408,8 @@ class Store:
                 "SELECT split, COUNT(*) n FROM clip WHERE {match} GROUP BY split",
                 "rowid", exclude={"split"},
             ),
-            "issue": run(
+            "issue": [{"value": "any", "count": any_issue}, {"value": "none", "count": no_issue}]
+            + run(
                 "SELECT code, COUNT(*) n FROM clip_issue WHERE {match} GROUP BY code ORDER BY n DESC",
                 "clip_rowid", exclude={"issue"},
             ),

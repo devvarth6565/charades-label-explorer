@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Charades Label Explorer</title>
+  <meta name="description" content="Browse, search and QA the Charades video action annotations.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#results">Skip to results</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <img src="favicon.svg" alt="" width="28" height="28">
+      <div>
+        <h1>Charades Label Explorer</h1>
+        <p class="tagline">Browse, search and QA temporally labeled video annotations</p>
+      </div>
+    </div>
+    <dl class="stats" id="stats" aria-label="Dataset totals"></dl>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="Search and filters">
+      <div class="search-box">
+        <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16"><path d="M8.5 3a5.5 5.5 0 0 1 4.38 8.83l3.9 3.9-1.06 1.06-3.9-3.9A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" fill="currentColor"/></svg>
+        <input id="q" type="search" placeholder="Search labels, scripts, objects…" autocomplete="off" spellcheck="false" aria-label="Search clips">
+        <kbd class="kbd-hint" aria-hidden="true">/</kbd>
+      </div>
+      <p class="search-help">Words are ANDed, <code>"quoted phrases"</code> stay together, stemming on (<em>cooks</em> finds <em>cooking</em>).</p>
+      <div id="filters" class="filters"></div>
+    </aside>
+
+    <main class="results" id="results" tabindex="-1">
+      <div class="toolbar">
+        <button type="button" class="btn filters-toggle" id="filters-toggle" aria-controls="sidebar" aria-expanded="false">Filters</button>
+        <div class="summary" id="summary" aria-live="polite"></div>
+        <div class="toolbar-actions">
+          <label class="sort">Sort <select id="sort"></select></label>
+          <a class="btn" id="export-csv" href="api/export.csv" download>Export CSV</a>
+          <a class="btn" id="export-json" href="api/export.json" download>JSON</a>
+        </div>
+      </div>
+      <div class="chips" id="chips" aria-label="Active filters"></div>
+      <div class="progress" id="progress" hidden></div>
+      <div class="error" id="error" role="alert" hidden></div>
+
+      <div class="table-wrap">
+        <table class="clips" id="clips">
+          <thead>
+            <tr>
+              <th scope="col" class="col-id">Clip</th>
+              <th scope="col" class="col-scene">Scene</th>
+              <th scope="col" class="col-len">Length</th>
+              <th scope="col" class="col-timeline">Action timeline</th>
+              <th scope="col" class="col-labels">Labels</th>
+              <th scope="col" class="col-quality" title="Annotator quality / relevance ratings (1-7)">Q / R</th>
+              <th scope="col" class="col-flags">QA</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>
+          <p><strong>No clips match these filters.</strong></p>
+          <button type="button" class="btn" id="empty-reset">Clear all filters</button>
+        </div>
+      </div>
+      <nav class="pager" id="pager" aria-label="Pagination"></nav>
+    </main>
+  </div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+    <header class="drawer-head">
+      <div class="drawer-nav">
+        <button type="button" class="icon-btn" id="prev-clip" title="Previous clip (k)" aria-label="Previous clip">‹</button>
+        <button type="button" class="icon-btn" id="next-clip" title="Next clip (j)" aria-label="Next clip">›</button>
+      </div>
+      <h2 id="drawer-title"></h2>
+      <button type="button" class="icon-btn" id="close-drawer" title="Close (Esc)" aria-label="Close">×</button>
+    </header>
+    <div class="drawer-body" id="drawer-body"></div>
+  </section>
+
+  <footer class="footer">
+    Data: <a href="https://prior.allenai.org/projects/charades" rel="noreferrer">Charades</a>
+    (Sigurdsson et al., 2016, AI2), non-commercial license. Not redistributed; fetched by <code>setup.sh</code>.
+  </footer>
+</body>
+</html>
