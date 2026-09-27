@@ -1,0 +1,8 @@
+# Downloaded dataset, index and sample videos (never committed: the Charades
+# license does not allow redistributing the data).
+/data/
+
+__pycache__/
+*.py[cod]
+.DS_Store
+*.part
