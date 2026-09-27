@@ -19,7 +19,7 @@ step), and searches with SQLite FTS5.
 | **2. Ingest + summary** | Parser for the CSV and 4 taxonomy files, producing clean records (verb/object resolved, scene normalized) plus 7 automatic label-QA checks. Web table with a mini action timeline per clip; detail drawer with a Gantt chart of every segment; CLI table and ASCII timeline. | 5 | [`charades.py`](explorer/charades.py), [`web/`](web/), [`cli.py`](explorer/cli.py) |
 | **3. Search + filter** | SQLite **FTS5** full-text search (BM25 ranking, stemming, phrases, search-as-you-type, highlighted matches) plus faceted filters with live counts (scene, action, verb, object, split, length, quality, verified, QA issue, has video). CSV/JSON export of any filtered view. | 5 | [`search.py`](explorer/search.py), [`index.py`](explorer/index.py) |
 | **4. README** | This file: dataset choice, how to run, assumptions, design notes, time log, reflections. | 4 | [`README.md`](README.md) |
-| **Bonus: deploy** | Dockerfile + Render blueprint, protected with HTTP Basic auth because the license forbids publicly re-hosting the data. Live link: *see [Deployment](#deployment-bonus)*. | 4 | [`Dockerfile`](Dockerfile), [`render.yaml`](render.yaml) |
+| **Bonus: deploy** | Dockerfile + Render blueprint, protected with HTTP Basic auth because the license forbids publicly re-hosting the data. Live: **<https://charades-label-explorer.onrender.com>** (login in [Deployment](#deployment-bonus)). | 4 | [`Dockerfile`](Dockerfile), [`render.yaml`](render.yaml) |
 | **Extras** | Plays sample videos with a playhead synced to the labels, fetched with HTTP range requests from inside the 16 GB video zip. 63 unit tests. CI on Ubuntu, macOS and a bare `python:3.8-slim`. | 4 | [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml) |
 
 ---
@@ -189,7 +189,9 @@ run.sh ────► server.py  JSON API + static UI (web/)      ─┐
 
 ## Deployment (bonus)
 
-> **Live instance:** _add the URL here after deploying_ · credentials shared with the reviewers privately
+> **Live instance:** <https://charades-label-explorer.onrender.com>  
+> Username `reviewer`; the password is shared with the reviewers privately.
+> Free tier: if nobody has visited for 15 minutes, the first load takes ~1 minute while the server wakes up.
 
 The Charades license forbids publicly re-hosting the data, so deployments
 sit behind HTTP Basic auth (`/healthz` stays open for the platform's health
