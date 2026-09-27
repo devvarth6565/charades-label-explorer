@@ -426,7 +426,7 @@ function renderRows() {
       h("div", { class: "clip-id" }, clip.id),
       h("div", { class: "badges" },
         clip.split === "test" ? h("span", { class: "badge" }, "test") : null,
-        clip.has_video ? h("span", { class: "badge video", title: "Sample video available" }, "▶ video") : null)),
+        clip.has_video ? h("span", { class: "badge video", title: "Sample video available", "aria-label": "has video" }, "▶") : null)),
     h("td", { class: "scene-cell" }, h("span", { class: "scene", title: clip.scene_detail || clip.scene }, clip.scene)),
     h("td", { class: "num" }, fmtSec(clip.length)),
     h("td", null, miniTimeline(clip)),
@@ -627,7 +627,7 @@ function wireVideo(video, gantt, rows, now, L) {
     const key = `${t.toFixed(1)}|${active.map((s) => s.class_id).join()}`;
     if (key !== lastKey) {
       lastKey = key;
-      now.replaceChildren(
+      fill(now,
         h("b", null, `${t.toFixed(1)}s`), active.length ? " now: " : " no labeled action",
         active.map((s) => h("span", { class: "label-chip", vars: { "--hue": hueOf(s.verb) } }, s.label)));
     }
