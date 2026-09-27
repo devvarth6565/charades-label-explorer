@@ -1,0 +1,17 @@
+# Render Blueprint (Dashboard -> New -> Blueprint -> pick this repo).
+# Free web services sleep when idle; the first request after a nap takes ~30 s.
+services:
+  - type: web
+    name: charades-label-explorer
+    runtime: python
+    plan: free
+    buildCommand: ./setup.sh --videos 16
+    startCommand: ./run.sh serve --quiet
+    healthCheckPath: /healthz
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      # "user:password". Keeps the instance private to reviewers, because the
+      # Charades license does not allow publicly re-hosting the data.
+      - key: EXPLORER_AUTH
+        sync: false
