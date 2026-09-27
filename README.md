@@ -20,7 +20,7 @@ step), and searches with SQLite FTS5.
 | **3. Search + filter** | SQLite **FTS5** full-text search (BM25 ranking, stemming, phrases, search-as-you-type, highlighted matches) plus faceted filters with live counts (scene, action, verb, object, split, length, quality, verified, QA issue, has video). CSV/JSON export of any filtered view. | 5 | [`search.py`](explorer/search.py), [`index.py`](explorer/index.py) |
 | **4. README** | This file: dataset choice, how to run, assumptions, design notes, time log, reflections. | 4 | [`README.md`](README.md) |
 | **Bonus: deploy** | Dockerfile + Render blueprint, protected with HTTP Basic auth because the license forbids publicly re-hosting the data. Live link: *see [Deployment](#deployment-bonus)*. | 4 | [`Dockerfile`](Dockerfile), [`render.yaml`](render.yaml) |
-| **Extras** | Plays sample videos with a playhead synced to the labels, fetched with HTTP range requests from inside the 16 GB video zip. 62 unit tests. CI on Ubuntu, macOS and a bare `python:3.8-slim`. | 4 | [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml) |
+| **Extras** | Plays sample videos with a playhead synced to the labels, fetched with HTTP range requests from inside the 16 GB video zip. 63 unit tests. CI on Ubuntu, macOS and a bare `python:3.8-slim`. | 4 | [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml) |
 
 ---
 
@@ -41,7 +41,7 @@ Terminal use (same query engine as the web UI):
 ./run.sh search --issue inverted_segment --format csv > flagged.csv
 ./run.sh show 46GP8                                 # one clip, ASCII action timeline
 ./run.sh stats                                      # dataset summary
-./run.sh test                                       # 62 unit tests, offline
+./run.sh test                                       # 63 unit tests, offline
 ```
 
 | Option | Effect |
@@ -49,7 +49,7 @@ Terminal use (same query engine as the web UI):
 | `./setup.sh --videos 0` (or `SAMPLE_VIDEOS=0`) | Skip sample videos (setup then takes ~5-15 s) |
 | `./setup.sh --videos 50` | Fetch more sample videos (~1-2 MB each) |
 | `PORT=9000 HOST=0.0.0.0 ./run.sh` | Bind elsewhere |
-| `EXPLORER_AUTH=user:pass ./run.sh` | Require HTTP Basic auth |
+| `EXPLORER_AUTH=user:pass ./run.sh` | Require HTTP Basic auth (or `EXPLORER_PASSWORD=…`, user `reviewer`) |
 
 ## What you can do with it
 
@@ -191,19 +191,22 @@ run.sh ────► server.py  JSON API + static UI (web/)      ─┐
 
 > **Live instance:** _add the URL here after deploying_ · credentials shared with the reviewers privately
 
-The Charades license forbids publicly re-hosting the data, so a deployment
-should set `EXPLORER_AUTH=user:password` (HTTP Basic auth; `/healthz` stays
-open for the platform's health check).
+The Charades license forbids publicly re-hosting the data, so deployments
+sit behind HTTP Basic auth (`/healthz` stays open for the platform's health
+check). Set `EXPLORER_AUTH=user:password`, or `EXPLORER_PASSWORD` (user
+defaults to `reviewer`).
 
 - **Render (free tier):** New → Blueprint → select this repo. [`render.yaml`](render.yaml)
-  runs `./setup.sh` at build time and `./run.sh serve` at start. Set `EXPLORER_AUTH` when prompted.
+  runs `./setup.sh` at build time and `./run.sh serve` at start, and has
+  Render generate `EXPLORER_PASSWORD`, so no secret is typed or committed.
+  Free instances sleep after 15 idle minutes; the first request then takes ~30-60 s.
 - **Any container host** (Cloud Run, Fly.io, Railway): `docker build -t charades-explorer .`
   then `docker run -p 8080:8080 -e EXPLORER_AUTH=user:pass charades-explorer`.
   The image contains the data, so push it only to a private registry.
 
 ## Tests
 
-`./run.sh test` runs 62 `unittest` tests in about 3 s, fully offline. They
+`./run.sh test` runs 63 `unittest` tests in about 3 s, fully offline. They
 use a hand-written fixture in the Charades format ([`tests/fixtures/`](tests/fixtures/charades_mini)),
 because the license forbids committing real rows.
 
@@ -276,7 +279,7 @@ explorer/               Python package (stdlib only)
   server.py             HTTP API, static files, video ranges, auth
   cli.py, export.py     terminal interface, CSV export
 web/                    index.html, app.js, style.css (no build step)
-tests/                  62 unittest tests + synthetic fixture
+tests/                  63 unittest tests + synthetic fixture
 Dockerfile, render.yaml deployment
 ```
 

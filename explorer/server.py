@@ -10,7 +10,8 @@ Routes
   GET /videos/<id>.mp4        sample video, with HTTP Range support for seeking
   GET /healthz                liveness probe (never behind auth)
 
-Set EXPLORER_AUTH="user:password" to require HTTP Basic auth, e.g. when
+Set EXPLORER_AUTH="user:password" (or EXPLORER_PASSWORD, user "reviewer")
+to require HTTP Basic auth, e.g. when
 deploying (the Charades license does not allow publicly re-hosting the data).
 """
 from __future__ import annotations
@@ -268,6 +269,24 @@ class Handler(BaseHTTPRequestHandler):
         pass  # replaced by the one-line log in _dispatch
 
 
+def auth_from_env(environ) -> Optional[str]:
+    """Basic-auth credentials as ``user:password``, or None for no auth.
+
+    Either ``EXPLORER_AUTH=user:password``, or ``EXPLORER_PASSWORD`` with an
+    optional ``EXPLORER_USER`` (default "reviewer"). The second form lets a
+    host such as Render generate the password so nobody has to type one.
+    """
+    auth = environ.get("EXPLORER_AUTH")
+    if auth:
+        if ":" not in auth:
+            raise ValueError("EXPLORER_AUTH must look like user:password")
+        return auth
+    password = environ.get("EXPLORER_PASSWORD")
+    if password:
+        return f"{environ.get('EXPLORER_USER') or 'reviewer'}:{password}"
+    return None
+
+
 def make_server(host: str, port: int, app: App) -> ThreadingHTTPServer:
     server = ThreadingHTTPServer((host, port), Handler)
     server.daemon_threads = True
@@ -287,9 +306,10 @@ def main(argv=None) -> int:
     except FileNotFoundError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
-    auth = os.environ.get("EXPLORER_AUTH") or None
-    if auth and ":" not in auth:
-        print("error: EXPLORER_AUTH must look like user:password", file=sys.stderr)
+    try:
+        auth = auth_from_env(os.environ)
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return 1
     app = App(store, config.WEB_DIR, config.VIDEO_DIR, auth=auth, quiet=args.quiet)
 

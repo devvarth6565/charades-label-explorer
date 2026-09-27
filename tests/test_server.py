@@ -13,7 +13,7 @@ from explorer import config
 from explorer.charades import load_dataset
 from explorer.index import build_index, mark_videos
 from explorer.search import Store
-from explorer.server import App, make_server, parse_range
+from explorer.server import App, auth_from_env, make_server, parse_range
 
 FIXTURES = Path(__file__).parent / "fixtures" / "charades_mini"
 VIDEO_BYTES = bytes(range(256)) * 40  # 10,240 bytes of fake "video"
@@ -168,6 +168,14 @@ class AuthTest(ServerTestCase):
 
     def test_health_check_stays_open(self):
         self.assertEqual(self.request("/healthz")[0], 200)
+
+    def test_auth_from_env(self):
+        self.assertIsNone(auth_from_env({}))
+        self.assertEqual(auth_from_env({"EXPLORER_AUTH": "a:b"}), "a:b")
+        self.assertEqual(auth_from_env({"EXPLORER_PASSWORD": "x+y/z="}), "reviewer:x+y/z=")
+        self.assertEqual(auth_from_env({"EXPLORER_USER": "lab", "EXPLORER_PASSWORD": "p"}), "lab:p")
+        with self.assertRaises(ValueError):
+            auth_from_env({"EXPLORER_AUTH": "no-colon"})
 
 
 if __name__ == "__main__":

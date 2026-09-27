@@ -1,5 +1,5 @@
 # Render Blueprint (Dashboard -> New -> Blueprint -> pick this repo).
-# Free web services sleep when idle; the first request after a nap takes ~30 s.
+# Free web services sleep after 15 min idle; the next request takes ~30-60 s.
 services:
   - type: web
     name: charades-label-explorer
@@ -11,7 +11,10 @@ services:
     envVars:
       - key: HOST
         value: 0.0.0.0
-      # "user:password". Keeps the instance private to reviewers, because the
+      # HTTP Basic auth keeps the instance private to reviewers, because the
       # Charades license does not allow publicly re-hosting the data.
-      - key: EXPLORER_AUTH
-        sync: false
+      # Render generates the password; read it under Environment.
+      - key: EXPLORER_USER
+        value: reviewer
+      - key: EXPLORER_PASSWORD
+        generateValue: true
