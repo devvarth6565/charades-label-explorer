@@ -9,6 +9,7 @@ Routes
   GET /api/export.json?...    all matching clips as JSON
   GET /videos/<id>.mp4        sample video, with HTTP Range support for seeking
   GET /healthz                liveness probe (never behind auth)
+  GET /robots.txt             tells crawlers not to index the demo
 
 Set EXPLORER_AUTH="user:password" (or EXPLORER_PASSWORD, user "reviewer")
 to require HTTP Basic auth, e.g. when
@@ -48,6 +49,8 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",
     "X-Frame-Options": "DENY",
+    # The demo is for reviewers with the link; keep it out of search engines.
+    "X-Robots-Tag": "noindex, nofollow",
     "Content-Security-Policy": (
         "default-src 'self'; img-src 'self' data:; media-src 'self'; style-src 'self'; "
         "script-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
@@ -120,6 +123,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if path == "/healthz":
                 self._send_bytes(b"ok\n", "text/plain; charset=utf-8")
+            elif path == "/robots.txt":
+                self._send_bytes(b"User-agent: *\nDisallow: /\n", "text/plain; charset=utf-8")
             elif not self._authorized():
                 self._send_json({"error": "authentication required"}, HTTPStatus.UNAUTHORIZED,
                                 {"WWW-Authenticate": 'Basic realm="Charades Label Explorer", charset="UTF-8"'})

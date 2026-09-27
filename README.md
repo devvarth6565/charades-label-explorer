@@ -19,8 +19,8 @@ step), and searches with SQLite FTS5.
 | **2. Ingest + summary** | Parser for the CSV and 4 taxonomy files, producing clean records (verb/object resolved, scene normalized) plus 7 automatic label-QA checks. Web table with a mini action timeline per clip; detail drawer with a Gantt chart of every segment; CLI table and ASCII timeline. | 5 | [`charades.py`](explorer/charades.py), [`web/`](web/), [`cli.py`](explorer/cli.py) |
 | **3. Search + filter** | SQLite **FTS5** full-text search (BM25 ranking, stemming, phrases, search-as-you-type, highlighted matches) plus faceted filters with live counts (scene, action, verb, object, split, length, quality, verified, QA issue, has video). CSV/JSON export of any filtered view. | 5 | [`search.py`](explorer/search.py), [`index.py`](explorer/index.py) |
 | **4. README** | This file: dataset choice, how to run, assumptions, design notes, time log, reflections. | 4 | [`README.md`](README.md) |
-| **Bonus: deploy** | Dockerfile + Render blueprint, protected with HTTP Basic auth because the license forbids publicly re-hosting the data. Live: **<https://charades-label-explorer.onrender.com>** (login in [Deployment](#deployment-bonus)). | 4 | [`Dockerfile`](Dockerfile), [`render.yaml`](render.yaml) |
-| **Extras** | Plays sample videos with a playhead synced to the labels, fetched with HTTP range requests from inside the 16 GB video zip. 63 unit tests. CI on Ubuntu, macOS and a bare `python:3.8-slim`. | 4 | [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml) |
+| **Bonus: deploy** | Dockerfile + Render blueprint. Live, no login needed: **<https://charades-label-explorer.onrender.com>**. Kept out of search engines; optional password lock built in. | 4 | [`Dockerfile`](Dockerfile), [`render.yaml`](render.yaml) |
+| **Extras** | Plays sample videos with a playhead synced to the labels, fetched with HTTP range requests from inside the 16 GB video zip. 64 unit tests. CI on Ubuntu, macOS and a bare `python:3.8-slim`. | 4 | [`tests/`](tests/), [`ci.yml`](.github/workflows/ci.yml) |
 
 ---
 
@@ -41,7 +41,7 @@ Terminal use (same query engine as the web UI):
 ./run.sh search --issue inverted_segment --format csv > flagged.csv
 ./run.sh show 46GP8                                 # one clip, ASCII action timeline
 ./run.sh stats                                      # dataset summary
-./run.sh test                                       # 63 unit tests, offline
+./run.sh test                                       # 64 unit tests, offline
 ```
 
 | Option | Effect |
@@ -189,18 +189,18 @@ run.sh ────► server.py  JSON API + static UI (web/)      ─┐
 
 ## Deployment (bonus)
 
-> **Live instance:** <https://charades-label-explorer.onrender.com>  
-> Username `reviewer`; the password is shared with the reviewers privately.
+> **Live instance:** <https://charades-label-explorer.onrender.com> (open, no login)  
 > Free tier: if nobody has visited for 15 minutes, the first load takes ~1 minute while the server wakes up.
 
-The Charades license forbids publicly re-hosting the data, so deployments
-sit behind HTTP Basic auth (`/healthz` stays open for the platform's health
-check). Set `EXPLORER_AUTH=user:password`, or `EXPLORER_PASSWORD` (user
-defaults to `reviewer`).
+The demo is open so reviewers can use it straight from the link. Because the
+Charades license allows evaluation use but not general re-hosting, it is kept
+out of search engines (`robots.txt`, `X-Robots-Tag: noindex`) and serves only
+the annotations plus 16 sample clips. To lock a deployment, set
+`EXPLORER_PASSWORD` (user `reviewer`) or `EXPLORER_AUTH=user:password` for
+HTTP Basic auth; `/healthz` always stays open for health checks.
 
 - **Render (free tier):** New → Blueprint → select this repo. [`render.yaml`](render.yaml)
-  runs `./setup.sh` at build time and `./run.sh serve` at start, and has
-  Render generate `EXPLORER_PASSWORD`, so no secret is typed or committed.
+  runs `./setup.sh` at build time and `./run.sh serve` at start.
   Free instances sleep after 15 idle minutes; the first request then takes ~30-60 s.
 - **Any container host** (Cloud Run, Fly.io, Railway): `docker build -t charades-explorer .`
   then `docker run -p 8080:8080 -e EXPLORER_AUTH=user:pass charades-explorer`.
@@ -208,7 +208,7 @@ defaults to `reviewer`).
 
 ## Tests
 
-`./run.sh test` runs 63 `unittest` tests in about 3 s, fully offline. They
+`./run.sh test` runs 64 `unittest` tests in about 3 s, fully offline. They
 use a hand-written fixture in the Charades format ([`tests/fixtures/`](tests/fixtures/charades_mini)),
 because the license forbids committing real rows.
 
@@ -218,7 +218,7 @@ because the license forbids committing real rows.
   expansion, hostile FTS syntax, pagination, facet counts, the non-FTS
   fallback.
 - **Server:** routes, 400/404 handling, CSV export, gzip, CSP headers, path
-  traversal, byte ranges (including 416), Basic auth.
+  traversal, byte ranges (including 416), Basic auth, noindex/robots.txt.
 - **Fetch:** remote-zip extraction with one request per member, CRC
   corruption detection, refusing servers that ignore `Range`, checksum
   verification.
@@ -281,7 +281,7 @@ explorer/               Python package (stdlib only)
   server.py             HTTP API, static files, video ranges, auth
   cli.py, export.py     terminal interface, CSV export
 web/                    index.html, app.js, style.css (no build step)
-tests/                  63 unittest tests + synthetic fixture
+tests/                  64 unittest tests + synthetic fixture
 Dockerfile, render.yaml deployment
 ```
 

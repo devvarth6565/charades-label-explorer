@@ -11,10 +11,6 @@ services:
     envVars:
       - key: HOST
         value: 0.0.0.0
-      # HTTP Basic auth keeps the instance private to reviewers, because the
-      # Charades license does not allow publicly re-hosting the data.
-      # Render generates the password; read it under Environment.
-      - key: EXPLORER_USER
-        value: reviewer
-      - key: EXPLORER_PASSWORD
-        generateValue: true
+      # Open demo for reviewers (kept out of search engines via robots.txt and
+      # noindex headers). To require a login instead, add EXPLORER_PASSWORD
+      # (user "reviewer") or EXPLORER_AUTH=user:password here.

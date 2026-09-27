@@ -103,6 +103,11 @@ class StaticTest(ServerTestCase):
         self.assertIn("default-src 'self'", headers["Content-Security-Policy"])
         self.assertEqual(headers["X-Content-Type-Options"], "nosniff")
 
+    def test_kept_out_of_search_engines(self):
+        status, headers, body = self.request("/robots.txt")
+        self.assertEqual((status, body), (200, b"User-agent: *\nDisallow: /\n"))
+        self.assertEqual(self.request("/")[1]["X-Robots-Tag"], "noindex, nofollow")
+
     def test_path_traversal_is_blocked(self):
         for path in ("/../explorer/config.py", "/%2e%2e/explorer/config.py", "/..%2fREADME.md"):
             self.assertEqual(self.request(path)[0], 404, path)
