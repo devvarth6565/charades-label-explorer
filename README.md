@@ -6,6 +6,9 @@ A small internal tool for browsing, searching and QA-ing the labels of
 CLI, uses only the Python 3 standard library (no pip, no Node, no build
 step), and searches with SQLite FTS5.
 
+**Live demo:** **<https://charades-label-explorer.onrender.com>** (no login needed; if the free server is asleep, the first load takes ~1 minute)  
+**Code:** <https://github.com/devvarth6565/charades-label-explorer>
+
 ```bash
 ./setup.sh   # ~30 s: downloads + verifies the labels, builds the index, fetches 16 sample videos
 ./run.sh     # → http://127.0.0.1:8000
@@ -244,8 +247,6 @@ curl), to prove the clean-machine requirement.
 
 **What would I improve with two more hours?**
 
-<!-- Rewrite in your own words before submitting. -->
-
 I would fetch videos on demand, so any of the 9,848 clips can play the
 moment its drawer opens instead of a fixed sample of 16. The range-request
 code already does the hard part. Next I'd close the QA loop: let a reviewer
@@ -257,16 +258,16 @@ result sets by computing the matching IDs once per request.
 
 **What's one thing I didn't already know how to do, and how did I figure it out?**
 
-> ✏️ **DRAFT, delete this line after rewriting it as your own experience.**
-
-I didn't know you could pull one file out of a remote zip without
-downloading it. I read how the zip format is laid out: a central directory
-at the end lists every file's offset, and each file sits behind a small
-local header. Python's `zipfile` accepts any seekable file object, so I
-wrote a file object whose reads become HTTP range requests. I checked the
-approach by extracting one video and comparing its CRC-32 against the one
-stored in the directory. I then wrote a unit test that builds a zip in
-memory, so the logic is tested without network access.
+I didn't know you could pull a single file out of a remote zip without
+downloading the whole archive, which mattered because the Charades videos
+ship as one 16 GB zip. I read how the zip format is laid out: a central
+directory at the end lists every file's offset, and each file sits behind a
+small local header. Since Python's `zipfile` accepts any seekable file object,
+I wrote one whose reads become HTTP range requests, so only the directory and
+the chosen videos are downloaded. I checked it by extracting one video and
+comparing its CRC-32 with the one stored in the directory. Finally I wrote a
+unit test that builds a zip in memory, so the logic stays tested without
+network access.
 
 ## Project layout
 
